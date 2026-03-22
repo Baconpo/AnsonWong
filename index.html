@@ -146,6 +146,11 @@
   <div class="content"><div class="content-inner" id="content"></div></div>
 </div>
 
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+  </div>
+  
 <script>
 const A = {
   'reg-categories': {
