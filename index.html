@@ -92,12 +92,60 @@
     .original-link:hover { color: var(--color-text-primary); border-color: var(--color-text-primary); }
     nav::-webkit-scrollbar, .commentary::-webkit-scrollbar, .content::-webkit-scrollbar { width: 4px; }
     nav::-webkit-scrollbar-thumb, .commentary::-webkit-scrollbar-thumb, .content::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+    /* Mobile nav toggle button */
+    .mobile-bar { display: none; }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; height: auto; overflow: visible; }
+
+      /* Mobile top bar */
+      .mobile-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--color-surface); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 100; }
+      .mobile-bar .name { font-family: var(--font-serif); font-size: 15px; font-weight: 400; letter-spacing: -0.01em; }
+      .mobile-hamburger { background: none; border: none; cursor: pointer; padding: 4px; display: flex; flex-direction: column; gap: 5px; }
+      .mobile-hamburger span { display: block; width: 20px; height: 1.5px; background: var(--color-text-primary); border-radius: 2px; transition: opacity 0.15s; }
+
+      /* Nav drawer */
+      nav { position: fixed; top: 0; left: -100%; width: 80vw; max-width: 300px; height: 100vh; z-index: 200; transition: left 0.25s ease; box-shadow: none; }
+      nav.open { left: 0; box-shadow: 4px 0 24px rgba(0,0,0,0.12); }
+      .nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 199; }
+      .nav-overlay.open { display: block; }
+
+      /* Commentary collapsible */
+      .commentary { width: 100%; border-right: none; border-bottom: 1px solid var(--color-border); padding: 0; overflow: visible; }
+      .commentary-inner { padding: 24px 20px; }
+      .commentary-toggle { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; background: var(--color-surface); border: none; width: 100%; text-align: left; border-bottom: 1px solid var(--color-border-subtle); }
+      .commentary-toggle-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); }
+      .commentary-toggle-arrow { font-size: 11px; color: var(--color-text-muted); transition: transform 0.2s; }
+      .commentary-toggle-arrow.open { transform: rotate(180deg); }
+      .commentary-body { display: none; padding: 24px 20px; }
+      .commentary-body.open { display: block; }
+
+      /* Content full width */
+      .content { width: 100%; min-height: 100vh; }
+      .content-inner { padding: 24px 16px 60px; }
+      .content-header h2 { font-size: 20px; }
+      .doc-block-body { padding: 14px 16px; }
+      .bio-block { padding: 18px 16px; }
+      .content-inner { max-width: 100%; }
+    }
   </style>
 </head>
 <body>
 <div class="layout">
 
-  <nav>
+  <!-- Mobile top bar -->
+  <div class="mobile-bar">
+    <div class="name">Anson's Portfolio</div>
+    <button class="mobile-hamburger" onclick="toggleNav()" aria-label="Open navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Nav overlay (tap to close) -->
+  <div class="nav-overlay" id="nav-overlay" onclick="toggleNav()"></div>
+
+  <nav id="nav">
     <div class="nav-header">
       <div class="name">Anson's Portfolio</div>
       <div class="role">Technical Writer</div>
@@ -142,7 +190,16 @@
     </div>
   </nav>
 
-  <div class="commentary" id="commentary"></div>
+  <div class="commentary" id="commentary-panel">
+    <button class="commentary-toggle" onclick="toggleCommentary()" id="commentary-toggle">
+      <span class="commentary-toggle-label">Commentary</span>
+      <span class="commentary-toggle-arrow" id="commentary-arrow">▼</span>
+    </button>
+    <div class="commentary-body" id="commentary-body">
+      <div id="commentary"></div>
+    </div>
+    <div class="commentary-inner" id="commentary-desktop"></div>
+  </div>
   <div class="content"><div class="content-inner" id="content"></div></div>
 </div>
 
@@ -162,6 +219,30 @@ function closeLightbox() {
   document.getElementById('lightbox').classList.remove('open');
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+
+function toggleNav() {
+  document.getElementById('nav').classList.toggle('open');
+  document.getElementById('nav-overlay').classList.toggle('open');
+}
+
+function toggleCommentary() {
+  const body = document.getElementById('commentary-body');
+  const arrow = document.getElementById('commentary-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function isMobile() { return window.innerWidth <= 768; }
+
+function setCommentary(html) {
+  if (isMobile()) {
+    document.getElementById('commentary').innerHTML = html;
+    document.getElementById('commentary-desktop').innerHTML = '';
+  } else {
+    document.getElementById('commentary-desktop').innerHTML = html;
+    document.getElementById('commentary').innerHTML = '';
+  }
+}
 const A = {
   'reg-categories': {
     c: { eyebrow:'Support Documentation · Registration', title:'Creating registration categories', tags:['Registration','Setup','Ticketing'],
@@ -575,8 +656,9 @@ function load(id,btn){
   const art=A[id]; if(!art)return;
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   if(btn)btn.classList.add('active');
+  if(isMobile()){ document.getElementById('nav').classList.remove('open'); document.getElementById('nav-overlay').classList.remove('open'); }
   const c=art.c;
-  document.getElementById('commentary').innerHTML=`
+  setCommentary(`
     <div class="commentary-eyebrow">${c.eyebrow}</div>
     <h1>${c.title}</h1>
     <div class="commentary-meta">${c.tags.map(t=>`<span class="meta-tag">${t}</span>`).join('')}</div>
@@ -584,7 +666,7 @@ function load(id,btn){
     ${c.annotation?`<div class="annotation"><p>${c.annotation}</p></div>`:''}
     <div class="commentary-section"><h2>Editorial decisions</h2><p>${c.decisions}</p></div>
     ${c.url?`<div class="commentary-section"><h2>Original article</h2><a href="${c.url}" target="_blank" class="original-link">Read the original article <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></div>`:''}
-  `;
+  `);
   const ct=art.content;
   document.getElementById('content').innerHTML=`
     <div class="content-header"><div class="type-label">${ct.type}</div><h2>${ct.title}</h2></div>
@@ -611,13 +693,14 @@ function load(id,btn){
 function loadAbout(btn){
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   if(btn)btn.classList.add('active');
+  if(isMobile()){ document.getElementById('nav').classList.remove('open'); document.getElementById('nav-overlay').classList.remove('open'); }
 
-  document.getElementById('commentary').innerHTML=`
+  setCommentary(`
     <div class="commentary-eyebrow">Portfolio</div>
     <h1>Anson Wong</h1>
     <div class="commentary-meta">
       <span class="meta-tag">Technical Writer</span>
-      <span class="meta-tag">Toronto, ON</span>
+      <span class="meta-tag">Richmond Hill, ON</span>
     </div>
     <p>This portfolio collects technical documentation, internal knowledge base articles, and content strategy work produced at <strong>PheedLoop</strong> — an event management SaaS platform serving Canadian and American markets.</p>
     <p>When I joined PheedLoop, I took ownership of the Knowledge Base and grew it significantly — writing, structuring, and maintaining over 500 articles across five separate sites. This portfolio is a curated selection of what I consider the strongest examples of that work.</p>
@@ -625,7 +708,7 @@ function loadAbout(btn){
     <div class="commentary-section">
       <h2>About this site</h2>
       <p>Built as a static GitHub Pages site — plain HTML, CSS, and JavaScript. Designed to mirror the format of API documentation, reflecting the technical nature of the work inside.</p>
-    </div>`;
+    </div>`);
 
   document.getElementById('content').innerHTML=`
     <div class="content-header">
