@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anson's Writing Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --nav-width: 230px; --commentary-width: 340px;
+      --color-bg: #fafaf9; --color-surface: #ffffff; --color-border: #e8e6e1; --color-border-subtle: #f0ede8;
+      --color-text-primary: #1a1916; --color-text-secondary: #6b6860; --color-text-muted: #9d9b96;
+      --color-accent-light: #f4f2ee; --color-content-bg: #f7f6f3; --color-content-border: #e4e2dc;
+      --font-sans: 'DM Sans', sans-serif; --font-serif: 'Newsreader', serif; --font-mono: 'DM Mono', monospace;
+    }
+    html, body { height: 100%; background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+    nav { width: var(--nav-width); flex-shrink: 0; background: var(--color-surface); border-right: 1px solid var(--color-border); display: flex; flex-direction: column; overflow-y: auto; }
+    .nav-header { padding: 28px 20px 20px; border-bottom: 1px solid var(--color-border-subtle); }
+    .nav-header .name { font-family: var(--font-serif); font-size: 16px; font-weight: 400; letter-spacing: -0.01em; }
+    .nav-header .role { font-size: 12px; color: var(--color-text-muted); margin-top: 3px; font-weight: 300; }
+    .nav-section { padding: 18px 12px 6px; }
+    .nav-section-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); padding: 0 8px; margin-bottom: 4px; }
+    .nav-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; color: var(--color-text-secondary); font-size: 12.5px; font-weight: 400; line-height: 1.4; text-decoration: none; transition: background 0.1s, color 0.1s; border: none; background: none; text-align: left; width: 100%; }
+    .nav-item:hover { background: var(--color-accent-light); color: var(--color-text-primary); }
+    .nav-item.active { background: var(--color-accent-light); color: var(--color-text-primary); font-weight: 500; }
+    .nav-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-border); flex-shrink: 0; margin-top: 4px; transition: background 0.1s; }
+    .nav-item.active .nav-dot, .nav-item:hover .nav-dot { background: var(--color-text-primary); }
+    .commentary { width: var(--commentary-width); flex-shrink: 0; background: var(--color-surface); border-right: 1px solid var(--color-border); overflow-y: auto; padding: 40px 32px; }
+    .commentary-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 12px; }
+    .commentary h1 { font-family: var(--font-serif); font-size: 22px; font-weight: 400; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 20px; }
+    .commentary-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--color-border-subtle); }
+    .meta-tag { font-size: 11px; color: var(--color-text-muted); background: var(--color-accent-light); border-radius: 4px; padding: 3px 8px; }
+    .commentary p { font-family: var(--font-serif); font-size: 15px; font-weight: 300; line-height: 1.75; color: var(--color-text-secondary); margin-bottom: 16px; }
+    .commentary p strong { font-weight: 400; color: var(--color-text-primary); }
+    .commentary-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--color-border-subtle); }
+    .commentary-section h2 { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 10px; }
+    .commentary-section p { font-size: 13px; line-height: 1.65; color: var(--color-text-secondary); font-weight: 300; }
+    .annotation { background: var(--color-accent-light); border-left: 2px solid var(--color-border); padding: 12px 14px; border-radius: 0 6px 6px 0; margin: 20px 0; }
+    .annotation p { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; margin: 0; }
+    .content { flex: 1; overflow-y: auto; background: var(--color-content-bg); }
+    .content-inner { max-width: 760px; margin: 0 auto; padding: 40px 40px 80px; }
+    .content-header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--color-content-border); }
+    .content-header .type-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 10px; }
+    .content-header h2 { font-family: var(--font-serif); font-size: 26px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.25; }
+    .doc-block { background: var(--color-surface); border: 1px solid var(--color-content-border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+    .doc-block-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-bottom: 1px solid var(--color-border-subtle); }
+    .doc-block-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-muted); font-family: var(--font-mono); }
+    .doc-block-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 3px; font-family: var(--font-mono); letter-spacing: 0.04em; }
+    .badge-note { background: #eff6ff; color: #3b71ca; }
+    .badge-warning { background: #fffbeb; color: #b45309; }
+    .badge-tip { background: #f0fdf4; color: #15803d; }
+    .badge-purple { background: #f5f3ff; color: #6d28d9; }
+    .doc-block-body { padding: 18px 20px; }
+    .doc-block-body h3 { font-family: var(--font-serif); font-size: 17px; font-weight: 400; color: var(--color-text-primary); margin-bottom: 10px; letter-spacing: -0.01em; line-height: 1.35; }
+    .doc-block-body p { font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 12px; font-weight: 300; }
+    .doc-block-body p:last-child { margin-bottom: 0; }
+    .doc-block-body ul { list-style: none; padding: 0; margin: 0; }
+    .doc-block-body li { font-size: 14px; color: var(--color-text-secondary); line-height: 1.65; padding: 6px 0 6px 16px; position: relative; border-bottom: 1px solid var(--color-border-subtle); font-weight: 300; }
+    .doc-block-body li:last-child { border-bottom: none; }
+    .doc-block-body li::before { content: ''; position: absolute; left: 0; top: 14px; width: 5px; height: 1px; background: var(--color-text-muted); }
+    .doc-block-body table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+    .doc-block-body th { text-align: left; padding: 8px 12px; font-weight: 500; color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border); background: var(--color-accent-light); font-size: 11px; letter-spacing: 0.03em; }
+    .doc-block-body td { padding: 8px 12px; color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-subtle); font-weight: 300; line-height: 1.5; vertical-align: top; }
+    .doc-block-body tr:last-child td { border-bottom: none; }
+    code { font-family: var(--font-mono); font-size: 12px; background: var(--color-accent-light); border: 1px solid var(--color-border); border-radius: 3px; padding: 1px 5px; }
+    .doc-block-body img { width: 100%; max-width: 100%; border-radius: 6px; border: 1px solid var(--color-content-border); margin-top: 12px; display: block; }
+    .bio-photo-wrapper { width: 100%; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--color-accent-light); border: 1px solid var(--color-content-border); margin-bottom: 28px; display: flex; align-items: center; justify-content: center; }
+    .bio-photo-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bio-photo-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 48px 24px; text-align: center; width: 100%; }
+    .bio-photo-placeholder p { font-size: 11px; color: var(--color-text-muted); font-family: var(--font-mono); line-height: 1.6; }
+    .bio-block { background: var(--color-surface); border: 1px solid var(--color-content-border); border-radius: 8px; margin-bottom: 16px; padding: 24px 28px; }
+    .bio-block h3 { font-family: var(--font-serif); font-size: 17px; font-weight: 400; color: var(--color-text-primary); margin-bottom: 14px; letter-spacing: -0.01em; line-height: 1.35; }
+    .bio-block p { font-size: 14px; color: var(--color-text-secondary); line-height: 1.75; margin-bottom: 12px; font-weight: 300; }
+    .bio-block p:last-child { margin-bottom: 0; }
+    .bio-block p strong { font-weight: 500; color: var(--color-text-primary); }
+    .bio-links { display: flex; flex-direction: column; gap: 12px; }
+    .bio-link { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; transition: color 0.1s; }
+    .bio-link:hover { color: var(--color-text-primary); }
+    .bio-link svg { flex-shrink: 0; opacity: 0.45; transition: opacity 0.1s; }
+    .bio-link:hover svg { opacity: 0.9; }
+    .original-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; border-bottom: 1px solid var(--color-border); padding-bottom: 1px; transition: color 0.1s, border-color 0.1s; }
+    .original-link:hover { color: var(--color-text-primary); border-color: var(--color-text-primary); }
+    nav::-webkit-scrollbar, .commentary::-webkit-scrollbar, .content::-webkit-scrollbar { width: 4px; }
+    nav::-webkit-scrollbar-thumb, .commentary::-webkit-scrollbar-thumb, .content::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <nav>
+    <div class="nav-header">
+      <div class="name">Anson's Portfolio</div>
+      <div class="role">Technical Writer</div>
+    </div>
+    <div class="nav-section" style="padding-bottom: 14px; border-bottom: 1px solid var(--color-border-subtle);">
+      <button class="nav-item" onclick="loadAbout(this)" style="font-weight: 400; color: var(--color-text-secondary);"><span class="nav-dot"></span>About me</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Registration</div>
+      <button class="nav-item active" onclick="load('reg-categories',this)"><span class="nav-dot"></span>Creating registration categories</button>
+      <button class="nav-item" onclick="load('reg-tickets',this)"><span class="nav-dot"></span>Creating registration ticket types</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Onsite &amp; Printing</div>
+      <button class="nav-item" onclick="load('epson-setup',this)"><span class="nav-dot"></span>Setting up rented Epson printers</button>
+      <button class="nav-item" onclick="load('epson-troubleshoot',this)"><span class="nav-dot"></span>Epson printer troubleshooting</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Integrations</div>
+      <button class="nav-item" onclick="load('zapier',this)"><span class="nav-dot"></span>Integrating Zapier</button>
+      <button class="nav-item" onclick="load('moneris',this)"><span class="nav-dot"></span>Setting up Moneris</button>
+      <button class="nav-item" onclick="load('wild-apricot',this)"><span class="nav-dot"></span>Using Wild Apricot with PheedLoop</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Developer</div>
+      <button class="nav-item" onclick="load('webhooks-setup',this)"><span class="nav-dot"></span>Setting up webhooks</button>
+      <button class="nav-item" onclick="load('webhooks-disabled',this)"><span class="nav-dot"></span>Why was my webhook disabled?</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Experiences</div>
+      <button class="nav-item" onclick="load('channels',this)"><span class="nav-dot"></span>Sessions channels feature</button>
+      <button class="nav-item" onclick="load('white-label',this)"><span class="nav-dot"></span>Preparing to white label your app</button>
+      <button class="nav-item" onclick="load('translations',this)"><span class="nav-dot"></span>Translating text, buttons &amp; labels</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Internal</div>
+      <button class="nav-item" onclick="load('styleguide',this)"><span class="nav-dot"></span>Style guide &amp; copywriter role</button>
+      <button class="nav-item" onclick="load('keyword-framework',this)"><span class="nav-dot"></span>Keyword Framework 2.0</button>
+    </div>
+    <div style="margin-top: auto; padding: 20px 20px 24px; border-top: 1px solid var(--color-border-subtle);">
+      <p style="font-size: 11px; color: var(--color-text-muted); line-height: 1.6; font-weight: 300;">All articles are published on the <a href="https://pheedloop.com/more/knowledge-base" target="_blank" style="color: var(--color-text-muted); text-decoration: underline; text-underline-offset: 2px;">PheedLoop Knowledge Base</a> and are publicly available.</p>
+    </div>
+  </nav>
+
+  <div class="commentary" id="commentary"></div>
+  <div class="content"><div class="content-inner" id="content"></div></div>
+</div>
+
+<script>
+const A = {
+  'reg-categories': {
+    c: { eyebrow:'Support Documentation · Registration', title:'Creating registration categories', tags:['Registration','Setup','Ticketing'],
+      intro:`Categories are one of the most commonly misunderstood parts of PheedLoop's registration flow — organizers often conflate them with ticket types, which are a separate but related concept. This article had to establish that distinction clearly before moving into setup steps.`,
+      body:`The structure mirrors the actual configuration sequence: category type first, because that choice determines everything downstream. I used a <strong>comparison table for category types</strong> early on to give readers a decision-making anchor before they start filling in fields.`,
+      annotation:`The default categories ("Attendee" and "Virtual Attendee") get a mention upfront because many users don't realize they're not mandatory — clearing that up early prevents unnecessary tickets.`,
+      decisions:`I included practical examples of category names from real events rather than generic placeholders. Readers respond better to "Member and Non-Member" than to "Category A and Category B."`,
+      url:`https://setup.support.pheedloop.com/article/1690-creating-your-registration-categories`},
+    content: { type:'Support Article', title:'Creating your registration categories',
+      blocks:[
+        {label:'Overview', body:`Categories are the foundation of your event's registration process. They define the path a registrant takes to become an attendee. A proper setup enables information collection, group registrations, ticket availability enforcement, and more. The default categories ("Attendee" and "Virtual Attendee") are available out of the box but are not required — they can be removed or renamed.`},
+        {label:'Common examples', list:['Member and Non-Member categorizations','VIP','In-Person Attendance','Virtual Attendance']},
+        {label:'Category types', badge:{text:'Reference',type:'note'}, heading:'Choosing the right category type',
+          table:{headers:['Category Type','What it does','When to use'], rows:[
+            ['Ticketed (Group)','Allows multiple ticket holders in one registration','Group registrations (teams, companies, families)'],
+            ['Ticketed (Individual)','Allows only one ticket holder per registration','Standard individual sign-ups'],
+            ['No Ticket (Individual)','Skips ticket selection entirely','Free events, RSVP-only registrations']]}},
+        {label:'Step 01', badge:{text:'Setup',type:'tip'}, heading:'Create a registration category',
+          body:`Navigate to <code>Registration > Categories</code> and select <strong>Create</strong>. Under <strong>Category Type</strong>, select the type that applies. Ensure the <strong>Active</strong> checkbox is toggled on — inactive categories will not appear on the Event Website.
+<img src="images/reg-categories-step-01.png" alt="Registration Categories create screen" />`},
+        {label:'Step 02', badge:{text:'Setup',type:'tip'}, heading:'Configure category details',
+          body:`Enter a <strong>Name</strong> and <strong>Description</strong>. Under <strong>Thumbnail Image</strong>, upload a custom image (recommended: 150×150 pixels). Under <strong>Details</strong>, toggle on any additional information fields required from registrants.
+<img src="images/reg-categories-step-02.png" alt="Registration Categories details configuration" />`},
+        {label:'Note', badge:{text:'Info',type:'note'},
+          body:`Tickets can be shared across multiple categories. A registrant selecting a given category will only see tickets assigned to it — but the same ticket may appear under multiple categories.`}
+      ]}
+  },
+
+  'reg-tickets': {
+    c: { eyebrow:'Support Documentation · Registration', title:'Creating registration ticket types', tags:['Registration','Ticketing','Payments'],
+      intro:`This article is a companion to the Registration Categories guide — it assumes the reader has already set up at least one category, and the prerequisite link at the top reflects that. Ticket creation is deliberately scoped to configuration only; pricing strategy is out of scope.`,
+      body:`The most important concept to surface early is the <strong>add-on ticket</strong> setting — it's easy to overlook in the UI, but it has significant implications for what a registrant can and can't purchase on its own. I gave it a dedicated step rather than burying it in a list.`,
+      annotation:`Leaving the price field as 0 creates a free ticket — not obvious to first-time users who might expect a separate toggle. I called this out explicitly.`,
+      decisions:`The test step at the end is intentional. Organizers frequently skip testing and discover misconfigured tickets only when real registrants encounter them. Normalizing testing as part of setup is a content goal, not just a technical instruction.`,
+      url:`https://setup.support.pheedloop.com/article/1691-creating-your-registration-ticket-types`},
+    content: { type:'Support Article', title:'Creating your registration ticket types',
+      blocks:[
+        {label:'Overview', body:`Tickets allow registrants to attend your event upon purchase. Each ticket must be assigned to a registration category. PheedLoop supports multiple ticket types with configurable pricing, availability windows, and purchase limits.`},
+        {label:'Common examples', list:['Day passes and full conference passes','Special event passes (e.g., dinner passes)','Student tickets','Early bird and regularly-priced passes']},
+        {label:'Step 01', badge:{text:'Setup',type:'tip'}, heading:'Create a ticket',
+          body:`Navigate to <code>Registration > Tickets</code> and select <strong>Create</strong>. Toggle on <strong>Activate Ticket</strong>. Enter a <strong>Name</strong>. Under <strong>Registration Category</strong>, assign it to one or more categories. The same ticket can belong to multiple categories.
+<img src="images/reg-tickets-step-01.png" alt="Registration Tickets create screen" />`},
+        {label:'Step 02', badge:{text:'Setup',type:'tip'}, heading:'Set pricing and availability',
+          body:`Under <strong>Price</strong>, enter the ticket cost. Leave the field as <strong>0</strong> to create a free ticket. Configure <strong>Quantity Available</strong>, <strong>Minimum Per Order</strong>, <strong>Limit Per Order</strong>, and <strong>Ticket Sale Start/End Dates</strong> as needed.
+<img src="images/reg-tickets-step-02.png" alt="Registration Tickets pricing and availability fields" />`},
+        {label:'Step 03', badge:{text:'Setup',type:'tip'}, heading:'Configure add-on behaviour',
+          body:`Under <strong>Options</strong>, toggle on <strong>Add On Ticket</strong> if this ticket should only be purchasable alongside a non-add-on ticket. Common use cases include workshops, dinners, and award ceremonies supplementary to the main event.
+<img src="images/reg-tickets-step-03.png" alt="Registration Tickets add-on option" />`},
+        {label:'Step 04', badge:{text:'Testing',type:'note'}, heading:'Test your tickets',
+          body:`After creating tickets and assigning them to categories, test the registration flow from the Event Website as a registrant would experience it. Conduct a few test registrations to confirm ticket display, pricing, and quantity limits work as intended.
+<img src="images/reg-tickets-step-04.png" alt="Registration Tickets test flow on Event Website" />`}
+      ]}
+  },
+
+  'epson-setup': {
+    c: { eyebrow:'Support Documentation · Onsite', title:'Setting up rented Epson printers with PheedLoop', tags:['Onsite','Hardware','Printing'],
+      intro:`This article introduces Epson full-colour inkjet badge printing as an alternative to Zebra thermal printers. The setup process is more involved, and the hardware is physically different, so the article needed to do more preparatory work before getting into steps.`,
+      body:`The biggest setup failure mode is a <strong>network mismatch</strong> between iPads and printers. I put this requirement at the top of the prerequisites and added an explicit warning callout — it's the single most common cause of day-of escalations.`,
+      annotation:`Epson printers use ink cartridges, unlike Zebra thermal printers. This matters for logistics: ink yield and maintenance boxes need to be ordered in advance. The article covers the yield math so organizers can plan for their event size.`,
+      decisions:`The article follows physical setup order: hardware check → network → printer assembly → iPad connection. This mirrors how an on-site team would encounter each step.`,
+      url:`https://onsite.support.pheedloop.com/article/2187-setting-up-your-rented-epson-printers-with-pheedloop`},
+    content: { type:'Support Article', title:'Setting up your rented Epson printers with PheedLoop',
+      blocks:[
+        {label:'Overview', body:`Epson badge printing offers professional, full-colour on-demand printing at attendee check-in. Unlike Zebra thermal printers, Epson printers require ink cartridges and a maintenance box installed at the venue before use. Epson printing is only available through <strong>PheedLoop OnSite</strong>.`},
+        {label:'Critical requirement', badge:{text:'Warning',type:'warning'}, heading:'Network setup',
+          body:`Both iPads (wireless) and Epson printers (wired via Ethernet) must be on the same network. This is the most common cause of printing failures. Confirm with the venue's IT team before event day.`},
+        {label:'Hardware included per kiosk', list:['1 Epson CW4000U printer','4 ink cartridges (Cyan, Magenta, Yellow, Black)','1 Maintenance Box','1 TP-Link WiFi 6 router per every 4 printers','2 iPads and stands']},
+        {label:'Step 01', badge:{text:'Setup',type:'tip'}, heading:'Install ink and maintenance box',
+          body:`The printer will not operate until both the Maintenance Box and all four ink cartridges are installed. Do this at the venue before any test prints. Ink yield is approximately 500 prints per cartridge set at 25% colour coverage.`},
+        {label:'Step 02', badge:{text:'Setup',type:'tip'}, heading:'Connect to the dedicated network',
+          body:`Connect each Epson printer to the TP-Link router via Ethernet. Connect iPads to the same router via Wi-Fi. Do not connect iPads to the venue's general Wi-Fi — use only the dedicated router included in the kiosk kit.`},
+        {label:'Step 03', badge:{text:'Setup',type:'tip'}, heading:'Pair via PheedLoop OnSite',
+          body:`Open <strong>PheedLoop OnSite</strong> on an iPad. Navigate to <code>Check In > Settings > Add or Edit Printers</code> and select <strong>Epson</strong>. Follow the on-screen pairing steps, then send a test badge to confirm the connection.`},
+        {label:'Note', badge:{text:'Info',type:'note'},
+          body:`If any hardware is missing from your kiosk kit, contact <code>logistics@pheedloop.com</code> before your event. Do not substitute hardware not included in the kit.`}
+      ]}
+  },
+
+  'epson-troubleshoot': {
+    c: { eyebrow:'Support Documentation · Onsite', title:'Epson printer troubleshooting', tags:['Onsite','Hardware','Troubleshooting'],
+      intro:`Troubleshooting articles are a different writing challenge from setup guides. The reader is already under pressure and needs to find their specific scenario fast. The structure is built entirely around that context.`,
+      body:`The Index at the top is the most important element — it lets readers jump directly to their error condition without reading linearly. I kept each section header as close as possible to the <strong>exact language a user would use</strong> to describe their problem, including common phrasing like "my badges are printing but..."`,
+      annotation:`The "Attendee is Not Permitted to Print this Template" error gets its own named subsection because it's one of the most frequent escalations and the resolution requires understanding Connected Tags — which can't be assumed. I wrote it to be fully self-contained.`,
+      decisions:`I resisted consolidating similar issues. Splitting "printer offline" and "attendee not permitted" into separate subsections — even though both appear as iPad errors — reduces cognitive load on a stressed user scanning for their specific problem.`,
+      url:`https://onsite.support.pheedloop.com/article/2189-epson-printer-not-working-step-by-step-help`},
+    content: { type:'Support Article', title:'Epson printer not working: step-by-step help',
+      blocks:[
+        {label:'How to use this article', body:`Find the scenario matching your issue in the index and navigate to it. Use <code>Ctrl+F</code> to search for exact error messages. If your issue is not listed, contact <code>logistics@pheedloop.com</code>.`},
+        {label:'Index', list:['Error on the iPad when sending to print','Badges printing but not cutting at the correct spot','Ink not aligned correctly when printing','Printer is "cleaning" itself','Ink cartridges or maintenance box running low','Printer not showing in available printers list','Epson printer appearing offline on the dashboard','Epson printer "double-printing" badges','Printer taking a long time per badge']},
+        {label:'iPad error', badge:{text:'Common',type:'tip'}, heading:'Error on the iPad when sending to print',
+          body:`Two causes. <strong>Printer Offline:</strong> confirm the printer status is Online in the Event Dashboard. In PheedLoop OnSite, verify the Epson is connected in check-in settings. <strong>Attendee Not Permitted to Print this Template:</strong> the attendee lacks the Connected Tag associated with the badge template. Manually assign the correct tag, then refresh the app. If the issue affects multiple attendees, remove the connected tag requirement from the template or create a duplicate without it.`},
+        {label:'Cut alignment', badge:{text:'Common',type:'tip'}, heading:'Badges not cutting at the correct spot',
+          body:`Occurs after a badge reload or printer jam. Resolved by <strong>calibrating the printer</strong>. Refer to the Epson setup article for calibration instructions.`},
+        {label:'Print alignment', badge:{text:'Common',type:'tip'}, heading:'Ink not aligned correctly',
+          body:`Adjust the <strong>Vertical Print Position Adjustment</strong> and <strong>Horizontal Print Position Adjustment</strong> in PheedLoop OnSite: <code>Check In > Settings > Add or Edit Printers > Epson printer > device info icon</code>.`},
+        {label:'Self-cleaning', badge:{text:'Info',type:'note'}, heading:'Printer is "cleaning" itself',
+          body:`Epson printers perform automatic head cleaning cycles — this is normal and cannot be disabled. Frequent cleaning may indicate low ink levels.`},
+        {label:'Ink levels', badge:{text:'Warning',type:'warning'}, heading:'Ink or maintenance box running low',
+          body:`Monitor ink levels throughout the event. A depleted maintenance box halts all printing. Replacements must be pre-ordered — they are not available as on-site replacements. Contact <code>logistics@pheedloop.com</code> if you anticipate running low before your event.`}
+      ]}
+  },
+
+  'zapier': {
+    c: { eyebrow:'Support Documentation · Integrations', title:'Integrating Zapier with PheedLoop', tags:['Integrations','Automation','API'],
+      intro:`Zapier is one of the most popular integration requests — the ability to connect PheedLoop to anything else the customer already uses. The challenge was that Zapier's own interface changes regularly, so the documentation needed to describe concepts and outcomes more than specific UI paths.`,
+      body:`The article is split into two distinct workflows: <strong>connecting PheedLoop to Zapier</strong> (one-time API credential setup) and <strong>building a Zap with PheedLoop as a trigger or action</strong>. These are frequently conflated but have different mental models.`,
+      annotation:`The API Secret Key warning is the most important callout — it's generated once and cannot be retrieved again. Losing it requires a full credential reset that breaks existing integrations.`,
+      decisions:`I included a reference table of available Zap actions rather than describing each in prose. The table lets readers scan for the action relevant to their use case without reading descriptions they don't need.`,
+      url:`https://setup.support.pheedloop.com/article/1890-how-to-integrate-zapier-with-pheedloop`},
+    content: { type:'Support Article', title:'How to integrate Zapier with PheedLoop',
+      blocks:[
+        {label:'Overview', body:`PheedLoop integrates with Zapier to enable automation between PheedLoop and external platforms. Common examples: adding PheedLoop attendees to a CRM on registration, or creating spreadsheet rows with registration and payment data automatically.`},
+        {label:'Step 01', badge:{text:'Setup',type:'tip'}, heading:'Get your API credentials',
+          body:`From the Event Dashboard, navigate to <code>Settings > Integrations > Rest API</code>. Copy your <strong>Organization Code</strong> and <strong>API Key</strong>. Select <strong>Generate New API Secret</strong> and copy the <strong>API Secret Key</strong>.`},
+        {label:'Critical', badge:{text:'Warning',type:'warning'}, heading:'API Secret Key is shown once',
+          body:`The API Secret Key is only displayed at generation time and cannot be retrieved afterwards. Store it securely immediately. Generating a new secret will disconnect all existing Zapier integrations — they will need to be re-authenticated.`},
+        {label:'Step 02', badge:{text:'Setup',type:'tip'}, heading:'Connect PheedLoop in Zapier',
+          body:`In Zapier, open your Zap and select the PheedLoop action or trigger. Select <strong>Sign In</strong> and enter your Organization Code, API Key, and API Secret Key. Select <strong>Yes, Continue to PheedLoop</strong>.`},
+        {label:'Step 03', badge:{text:'Setup',type:'tip'}, heading:'Create a Zap',
+          body:`Navigate to <code>Settings > Integrations > Zapier > Get Started > Learn More</code> to open the Zapier interface. Review <strong>Popular With PheedLoop Users</strong> for common templates before building from scratch.`},
+        {label:'Available triggers (sample)', badge:{text:'Reference',type:'note'},
+          table:{headers:['Zap action','Description'], rows:[
+            ['New Attendee Created','Triggers when an attendee is added to the event'],
+            ['Attendee Updated','Triggers when an attendee record is modified'],
+            ['Delete Attendee','Triggers when an attendee is removed from the dashboard'],
+            ['New Registration','Triggers when a registration order is completed']]}}
+      ]}
+  },
+
+  'moneris': {
+    c: { eyebrow:'Support Documentation · Integrations', title:'Setting up the Moneris integration', tags:['Integrations','Payments','Finance'],
+      intro:`Moneris is a popular payment processor in the Canadian market and one of the more technically sensitive integrations in PheedLoop. The setup requires a precise configuration — deviations cause integration errors, not just suboptimal behaviour.`,
+      body:`The structure is intentionally prescriptive. Rather than explaining why each setting matters, it tells the reader <strong>exactly what to toggle and what to leave alone</strong>. This is the right tradeoff for a technical integration where errors have real payment consequences.`,
+      annotation:`The cost note ($950/year) is surfaced at the very top as a callout — not buried in the body. Readers who haven't budgeted for this shouldn't get halfway through setup before discovering it's a paid add-on.`,
+      decisions:`I used section headings that mirror the exact names of the Moneris settings panels so readers can cross-reference the article and the Moneris UI without confusion.`,
+      url:`https://setup.support.pheedloop.com/article/1878-setting-up-the-moneris-integration`},
+    content: { type:'Support Article', title:'Setting up the Moneris integration',
+      blocks:[
+        {label:'Pricing note', badge:{text:'Warning',type:'warning'}, body:`The Moneris integration is a paid add-on at <strong>$950/year</strong>. Contact <code>support@pheedloop.com</code> to enable it before proceeding.`},
+        {label:'Overview', body:`Moneris is a payment processor for accepting credit card payments through PheedLoop. The settings below must be followed exactly — incorrect configuration will cause integration errors.`},
+        {label:'Step 01', badge:{text:'Setup',type:'tip'}, heading:'Create a Checkout Config Profile',
+          body:`Log in to Moneris. Navigate to <code>Admin > Moneris Checkout Config</code> and select <strong>Create Profile</strong>.`},
+        {label:'Step 02 — Checkout Type', badge:{text:'Setup',type:'tip'},
+          body:`Toggle on <strong>I have my custom order form and want to use Moneris simply for payment processing</strong>.`},
+        {label:'Step 03 — Payment', badge:{text:'Setup',type:'tip'}, heading:'Configure payment settings',
+          body:`Toggle <strong>Display Supported Cards</strong> <strong>OFF</strong>. Toggle on <strong>Auto Decision by Moneris</strong>. Set <strong>CVV</strong> to Optional or Mandatory. Toggle on <strong>Purchase</strong> under Transaction Type.`},
+        {label:'Step 04 — Branding', badge:{text:'Setup',type:'tip'}, heading:'Configure branding and design',
+          body:`Set <strong>Background</strong> to White. Toggle off <strong>Enable Fullscreen</strong> and <strong>Card Borders/Shadows</strong>. Set <strong>Process Text</strong> to Checkout and <strong>Cancel Text</strong> to Cancel or Back.`},
+        {label:'Step 05', badge:{text:'Setup',type:'tip'}, heading:'Connect to PheedLoop',
+          body:`From the PheedLoop Event Dashboard, navigate to <code>Settings > Integrations > Moneris</code>. Enter the Checkout Profile ID, Store ID, and API Token. Select <strong>Save</strong>.`}
+      ]}
+  },
+
+  'wild-apricot': {
+    c: { eyebrow:'Support Documentation · Integrations', title:'Using Wild Apricot with PheedLoop', tags:['Integrations','SSO','Identity'],
+      intro:`Wild Apricot is a membership management platform used by associations — a core segment of PheedLoop's customer base. This integration enables SSO so members can log in using their existing credentials. The article has two clearly delineated halves: Wild Apricot configuration, then PheedLoop configuration.`,
+      body:`The most important writing decision was the <strong>Trusted Redirect Domain</strong> step. The URL format is non-obvious and requires a specific suffix. Getting it wrong means SSO silently fails — I made this a bold callout rather than a regular list item.`,
+      annotation:`The custom domain edge case catches a disproportionate number of SSO failures. If the organization uses a custom PheedLoop domain, the redirect URL must reflect that — the article calls this out explicitly.`,
+      decisions:`I separated Wild Apricot configurations from PheedLoop configurations into two clear phases. You can't do the PheedLoop side until the Wild Apricot side is complete — making this a sequential structure reduces errors.`,
+      url:`https://setup.support.pheedloop.com/article/1907-using-wild-apricot-with-pheedloop`},
+    content: { type:'Support Article', title:'Using Wild Apricot with PheedLoop',
+      blocks:[
+        {label:'Overview', body:`Wild Apricot is a supported identity provider for PheedLoop Single Sign-On. Wild Apricot members can log into your PheedLoop event using their existing credentials. Setup requires configuration on both platforms.`},
+        {label:'Phase 1 — Wild Apricot', badge:{text:'Wild Apricot side',type:'tip'}, heading:'Configure your Wild Apricot account',
+          body:`Navigate to <code>Apps > Authorized Applications</code> and select <strong>Authorize Application > User Authorization</strong>. Enter an application name, select <strong>Generate API Key</strong> (Read only), and note your <strong>Client ID</strong> and <strong>Client Secret</strong>.`},
+        {label:'Critical', badge:{text:'Warning',type:'warning'}, heading:'Set the trusted redirect domain',
+          body:`Toggle on <strong>Authorize users via Wild Apricot single sign-on service</strong>. Under <strong>Trusted Redirect Domains</strong>, add <code>https://site.pheedloop.com/sso/redirect</code>. If using a custom domain, replace <code>site.pheedloop.com</code> with your domain. This step is required — SSO will not function without it.`},
+        {label:'Phase 2 — PheedLoop', badge:{text:'PheedLoop side',type:'tip'}, heading:'Connect Wild Apricot in PheedLoop',
+          body:`Navigate to <code>Settings > Integrations > Single Sign On Integrations</code> and select <strong>Not Connected</strong> under Wild Apricot. Enter your <strong>Client ID</strong>, <strong>Client Secret</strong>, and <strong>Authorization URL</strong>.`},
+        {label:'Authorization URL format', badge:{text:'Reference',type:'note'},
+          body:`Format: <code>https://&lt;org_wildapricot_url&gt;/sys/login/OAuthLogin</code> — where <code>&lt;org_wildapricot_url&gt;</code> is your Wild Apricot website address. The <code>/sys/login/OAuthLogin</code> suffix is mandatory.`}
+      ]}
+  },
+
+  'webhooks-setup': {
+    c: { eyebrow:'Support Documentation · Developer', title:'Setting up webhooks in PheedLoop', tags:['Developer','Webhooks','API'],
+      intro:`Webhooks documentation requires a different register — the audience is developers, and they'll lose confidence quickly if the technical framing isn't precise. At the same time, some non-technical event organizers also encounter this article, so the conceptual section needed to be accessible without being condescending.`,
+      body:`I opened with a concise definition distinguishing webhooks from polling — a distinction developers already know but one that helps non-technical readers understand the design rationale. The rest is operational: credentials, adding a webhook, reading the logs.`,
+      annotation:`The Webhook Secret confidentiality callout is important for security — it's the mechanism that verifies a payload came from PheedLoop. I called out the compromise scenario so readers understand it's not a formality.`,
+      decisions:`The webhook log column table was a late addition based on ticket feedback — users were confused by what "Event Name" referred to (it's the PheedLoop event name, not the webhook event type). That ambiguity warranted a full reference table.`,
+      url:`https://setup.support.pheedloop.com/article/2143-setting-up-webhooks-in-pheedloop`},
+    content: { type:'Support Article', title:'Setting up webhooks in PheedLoop',
+      blocks:[
+        {label:'Overview', body:`PheedLoop provides built-in webhook support, allowing real-time data to be sent to external systems when actions occur — such as a registration being created or an attendee checking in. Webhooks are available without additional pricing. Customers are responsible for creating and maintaining their own endpoints.`},
+        {label:'What is a webhook?', badge:{text:'Concept',type:'note'},
+          body:`A webhook sends data to an external URL automatically when a specific action occurs in PheedLoop. Unlike polling (repeatedly requesting data from an API), webhooks push data only when something happens — keeping external systems in sync efficiently.`},
+        {label:'Step 01', badge:{text:'Setup',type:'tip'}, heading:'Retrieve webhook credentials',
+          body:`Navigate to <code>Advanced > Webhooks > Settings</code>. Copy the <strong>Event Code</strong>, <strong>Organization Code</strong>, and <strong>Webhook Secret</strong>. Use these to configure your endpoint to authenticate incoming payloads.`},
+        {label:'Security', badge:{text:'Warning',type:'warning'},
+          body:`The Webhook Secret must never be shared publicly. If compromised, select <strong>Generate New Secret</strong> — this invalidates the previous secret. Update your endpoint configuration immediately.`},
+        {label:'Step 02', badge:{text:'Setup',type:'tip'}, heading:'Add a webhook',
+          body:`Navigate to <code>Advanced > Webhooks > Webhooks</code> and select <strong>Create</strong>. Under <strong>Resource</strong>, select the asset to monitor (attendees, registrations, check-ins). Under <strong>Action</strong>, select the trigger: create, update, or delete. Enter the endpoint <strong>URL</strong>. Select <strong>Save Changes</strong>.`},
+        {label:'Webhook log reference', badge:{text:'Reference',type:'note'},
+          table:{headers:['Column','Description'], rows:[
+            ['Event Name','The PheedLoop event — not the webhook event type'],
+            ['Resource','The type of object (registrations, attendees, check-ins)'],
+            ['Action','The trigger: created, updated, or deleted'],
+            ['Response Status','200 = success; 400 = endpoint config issue; 500 = receiving server error']]}}
+      ]}
+  },
+
+  'webhooks-disabled': {
+    c: { eyebrow:'Support Documentation · Developer', title:'Why was my webhook disabled?', tags:['Developer','Webhooks','Troubleshooting'],
+      intro:`This article answers a very specific question — one that users arrive at after receiving a Webhook Disabled notification email. The context of arrival matters: they're already aware something went wrong. They want to know why and how to fix it, in that order.`,
+      body:`The article leads with <strong>why webhooks are disabled</strong> rather than jumping straight to re-enablement. If a reader re-enables a webhook without understanding why it failed, it will fail again. Building understanding before the fix reduces repeat tickets.`,
+      annotation:`The Quick Reference table consolidates all the numerical thresholds in one place — 10 failures, 30 minutes, 5 retries, 10-second timeout. These numbers are mentioned in the body but easy to lose track of. The table serves as a scan-able reference for developers debugging retry logic.`,
+      decisions:`I kept scope narrow and deferred endpoint troubleshooting explicitly to the customer's development team. PheedLoop has limited visibility into third-party server behaviour, and over-promising support for external systems creates escalation problems.`,
+      url:`https://setup.support.pheedloop.com/article/2144-why-was-my-webhook-disabled`},
+    content: { type:'Support Article', title:'Why was my webhook disabled?',
+      blocks:[
+        {label:'Overview', body:`A Webhook Disabled Notification means a webhook in <code>Advanced > Webhooks</code> has failed repeatedly. PheedLoop automatically disables webhooks after sustained failures to maintain platform stability and prevent repeated failure emails.`},
+        {label:'Why webhooks are disabled', list:['Maintain platform stability by preventing repeated failed requests','Protect your integration when errors indicate a configuration or security issue','Avoid repeated failure emails when a webhook cannot be delivered']},
+        {label:'Common failure causes', badge:{text:'Reference',type:'note'}, list:['The endpoint URL is incorrect or temporarily unavailable','The SSL certificate on the endpoint has expired','Authentication credentials are missing or invalid','The endpoint takes longer than 10 seconds to respond','The endpoint returns a non-2xx status code (including redirects)']},
+        {label:'Re-enabling a webhook', badge:{text:'Steps',type:'tip'},
+          body:`Navigate to <code>Advanced > Webhooks > Webhooks</code> and find the disabled webhook. Select <strong>Actions > View Webhook Logs</strong> to identify the failure cause. Fix the issue on your server. Select <strong>Actions > Enable</strong>. Failure counters reset automatically on re-enabling.`},
+        {label:'Quick reference', badge:{text:'Reference',type:'note'},
+          table:{headers:['Setting','Value'], rows:[
+            ['Failure threshold before disable','10 failures'],
+            ['Time window for counting failures','30 minutes'],
+            ['Max retries per delivery','5 attempts'],
+            ['Request timeout','10 seconds'],
+            ['Webhook log retention','90 days']]}}
+      ]}
+  },
+
+  'channels': {
+    c: { eyebrow:'Support Documentation · Experiences', title:'Sessions channels feature', tags:['Virtual Portal','Event App','Sessions'],
+      intro:`Channels are simple in concept but confusing in execution because of how they relate to the existing Sessions feature. The article had to establish that relationship clearly before explaining how to use them — otherwise readers end up accidentally creating duplicate session entries.`,
+      body:`The key conceptual point is the <strong>mutual exclusivity rule</strong>: a session can live in Channels or in regular Sessions, but not both. I surfaced this as a callout early rather than footnoting it, because discovering it after setup requires undoing work.`,
+      annotation:`The article covers enabling Channels in two environments — Virtual Portal and Mobile App — because the paths are different. I kept these as labelled subsections rather than trying to merge them, which would have introduced hard-to-follow conditional branching.`,
+      decisions:`The Common Use Cases section at the end is intentionally aspirational. Many organizers don't realize channels can serve purposes beyond RTMP streams — language separation, on-demand vs live tracks, and breakout organization are all real customer use cases.`,
+      url:`https://faq.support.pheedloop.com/article/2033-how-the-sessions-channels-feature-works-with-the-virtual-portal-and-event-app`},
+    content: { type:'Support Article', title:'How the sessions channels feature works',
+      blocks:[
+        {label:'Overview', body:`Channels offer an alternate way to present session content in the Virtual Portal and Mobile App as a continuous stream. They are ideal for attendees who prefer to stay on one screen. Functionally, channels draw from the same data source as sessions — they provide a different viewing experience, not different content.`},
+        {label:'Important', badge:{text:'Warning',type:'warning'},
+          body:`A session can appear in the Channels section or the regular Sessions list — not both simultaneously. Sessions designated as channel sessions will not appear in the standard Sessions view.`},
+        {label:'Step 01A', badge:{text:'Virtual Portal',type:'tip'}, heading:'Enable channels in the Virtual Portal',
+          body:`Navigate to <code>Experiences > Virtual > Settings</code>. Under <strong>Options</strong>, toggle on <strong>Enable Channels Section</strong>. Select <strong>Save Changes</strong>.`},
+        {label:'Step 01B', badge:{text:'Mobile App',type:'tip'}, heading:'Enable channels in the Mobile App',
+          body:`Navigate to <code>Experiences > Mobile App > Pages</code>. Select <strong>Channels</strong> from the list. Toggle on <strong>Is Visible</strong>. Select <strong>Save Changes</strong>.`},
+        {label:'Step 02', badge:{text:'Setup',type:'tip'}, heading:'Designate sessions as channel sessions',
+          body:`Navigate to <code>Sessions > Sessions</code> and open the target session. Go to <strong>Virtual Settings</strong> and toggle on <strong>Channel Session</strong>. Select <strong>Save Changes</strong>. The session will move to the Channels navigation in both the Virtual Portal and Mobile App.`},
+        {label:'Common use cases', badge:{text:'Ideas',type:'note'}, list:['Separating English and French content tracks','Differentiating on-demand from live content','Separating breakout sessions from main sessions','Embedding a continuous RTMP stream with rotating speakers']}
+      ]}
+  },
+
+  'white-label': {
+    c: { eyebrow:'Support Documentation · Experiences', title:'Preparing to white label your mobile event app', tags:['Mobile App','Branding','White Label'],
+      intro:`The white label article spans multiple external platforms — Apple Developer, Google Play, and PheedLoop — each with their own account requirements. The writing challenge was sequencing all of that clearly without losing the reader partway through.`,
+      body:`The <strong>4-week minimum timeline</strong> is the single most important piece of information and it leads the article. White label requests that come in a week before an event cannot be accommodated — setting this expectation early prevents a category of escalations that no one can resolve.`,
+      annotation:`About 25% of PheedLoop events use white labelling. The comparison table for Event vs Organization options is relevant for customers deciding what to purchase, not just how to use it — so I included it early in the article rather than as an appendix.`,
+      decisions:`I included a section on what does and doesn't change in a white label app. A common misconception is that white labelling changes functionality — it doesn't. Only the App Store listing and branding change. Clarifying scope reduces post-launch complaints.`,
+      url:`https://faq.support.pheedloop.com/article/1966-preparing-to-white-label-your-mobile-event-app`},
+    content: { type:'Support Article', title:'Preparing to white label your mobile event app',
+      blocks:[
+        {label:'Timeline requirement', badge:{text:'Warning',type:'warning'},
+          body:`PheedLoop requires a <strong>minimum of 4 weeks</strong> from submission to publish. Rush submissions cannot be accommodated. <strong>Organization accounts</strong> are required for both Apple and Google — personal developer accounts are not compatible.`},
+        {label:'What is white labelling?',
+          body:`A white label mobile app lets you publish your event under your organization's brand in the Apple App Store and Google Play Store. Attendees find your app by searching your name rather than "PheedLoop Go!"`},
+        {label:'What gets customized', list:['App store icon and screenshots','App store listing and description','Splash screen shown when the app launches','App name attendees search for']},
+        {label:'What stays the same', badge:{text:'Info',type:'note'}, list:['All features and functionality','In-app experience after login','Event content, layout, and navigation']},
+        {label:'White label options', badge:{text:'Reference',type:'note'},
+          table:{headers:['Feature','Event White Label','Organization White Label'], rows:[
+            ['Best for','1–2 events per year','Multiple events under one brand'],
+            ['Scope','Single event only','All organization events in one app'],
+            ['Branding','Event-specific','Organization-wide'],
+            ['Cost','Per-event Power-Up','Organization Power-Up (one-time)']]}},
+        {label:'Process overview', badge:{text:'Steps',type:'tip'}, list:['Set up a Google Developer Account (organization account required)','Set up an Apple Developer Account (organization account required)','Configure white label settings under Experiences > Mobile App > White Label','Submit for development — PheedLoop handles App Store submission']}
+      ]}
+  },
+
+  'translations': {
+    c: { eyebrow:'Support Documentation · Experiences', title:'Translating text, buttons, phrases, and labels', tags:['Translations','Localization','Multi-language'],
+      intro:`The Translations feature serves two distinct use cases: replacing default PheedLoop UI text with organization-specific terminology, and enabling full multi-language support for international events. These are often conflated, so the structure addresses them as separate capabilities.`,
+      body:`The most common support scenario is a user whose translation isn't applying. Almost always it's a <strong>whitespace or capitalization mismatch</strong> in the Original Text field — the matching is exact. I included a specific callout for this rather than leaving it as an implicit caveat.`,
+      annotation:`The Simple Translations checkbox exists specifically to strip HTML formatting that prevents matches. I'd seen enough tickets about it to give it its own section rather than a footnote.`,
+      decisions:`Bulk upload gets a dedicated section at the end because it's the right approach for large-scale translation projects, but introduces a different workflow that would confuse readers who just need to change one label. Separating it keeps the primary flow clean.`,
+      url:`https://setup.support.pheedloop.com/article/1873-translating-text-button-phrases-and-labels`},
+    content: { type:'Support Article', title:'Translating text, buttons, phrases, and labels',
+      blocks:[
+        {label:'Overview', body:`The Translations feature serves two purposes: replacing PheedLoop's default UI text with your preferred terminology, and enabling multi-language support across the Mobile Event App, Virtual Event Portal, and Event Website.`},
+        {label:'Method 01', badge:{text:'Setup',type:'tip'}, heading:'Translating default text',
+          body:`Navigate to <code>Advanced > Translations</code> and select <strong>Create</strong>. Under <strong>Languages</strong>, select the portal's active language. Under <strong>Original Text</strong>, paste the exact default text — capitalization and spacing must match exactly. Under <strong>Modified Text</strong>, enter the replacement. Select <strong>Save Changes</strong>.`},
+        {label:'Tip', badge:{text:'Info',type:'note'},
+          body:`If a translation is not applying, use a plain paste (<code>Ctrl+Shift+V</code>) when entering the Original Text. The match is case-sensitive and space-sensitive. Hidden HTML formatting in copied text is a common culprit.`},
+        {label:'Simple translations', badge:{text:'Info',type:'note'}, heading:'When to use Simple Translations',
+          body:`The <strong>Simple Translations</strong> checkbox forces plain-text matching by removing HTML formatting. If a translation appears correct but still isn't applying, enabling this checkbox resolves most formatting-related mismatches.`},
+        {label:'Method 02', badge:{text:'Shortcut',type:'tip'}, heading:'Translate This Text shortcut',
+          body:`Throughout the Event Dashboard, a <strong>Translate This Text</strong> button appears below certain text fields. Select it to open a translation editor directly. Toggle on <strong>Use Object Source</strong> to auto-populate the original text, then enter your translation and save.`},
+        {label:'Method 03', badge:{text:'Advanced',type:'purple'}, heading:'Bulk uploading translations',
+          body:`For large-scale implementations, download the Translations Upload Template from the Translations section. Populate the Original Text and Modified Text columns, then upload back to the dashboard. Recommended for full multi-language projects.`}
+      ]}
+  },
+
+  'styleguide': {
+    c: { eyebrow:'Internal Documentation', title:'Style guide and copywriter role', tags:['Internal','Style','Onboarding'],
+      intro:`This document is the living onboarding reference for the Technical Writer role at PheedLoop. It covers the full scope of the job — from reviewing developer updates and filing bugs, to screenshot standards, keyword strategy, and navigating five separate Knowledge Base sites.`,
+      body:`The document grew significantly from its original version. The most meaningful additions are the <strong>Feature Review & Documentation Process</strong> section, which codifies how to go from a Slack update to a published article, and the <strong>Reviewing Developer Updates</strong> section, which gives concrete flags for when the KB does and doesn't need to change.`,
+      annotation:`The section on managing CS team requests is one of the more nuanced parts of the guide. The core tension it addresses: the CS team knows what they want fixed but not always what fixing it entails. Part of the role is interpreting the request, not just executing it.`,
+      decisions:`I kept the internal tooling sections (Pokedex, Staging, the Vaydeer keypad, the #cs-agent channel) as their own named sections rather than folding them into a catch-all appendix. They're advanced and optional, but a writer who doesn't know they exist can't use them. Last Updated: March 16, 2026.`},
+    content: { type:'Internal Documentation', title:'Responsibilities for the copywriter role',
+      blocks:[
+        {label:'Role clarification', badge:{text:'Internal',type:'purple'},
+          body:`While the title is "Copywriter," this role functions as a <strong>Technical Writer</strong>. The primary responsibility is understanding and explaining PheedLoop's product for the public-facing Knowledge Base and internal support documentation.`},
+        {label:'Feature review process', badge:{text:'Process',type:'tip'}, heading:'Documentation process for new updates',
+          body:null, list:[
+            'Identify the update in the Event Dashboard. If unclear after reviewing Slack and Linear, post a follow-up in the #customers-learning channel',
+            'Test hands-on using a personal test event before writing. A second untouched test event is useful for comparison',
+            'Draft the article with three pillars in mind: Essential Details, Strategic Framing (frame as a feature enhancement, not a bug fix), and Use Case context'
+          ]},
+        {label:'Article outline', badge:{text:'Standard',type:'note'}, heading:'Forming an article outline',
+          body:`Follow this general flow: <strong>Key Details First</strong> → <strong>Prerequisites</strong> → <strong>Step-by-Step Configuration</strong> → <strong>Front-End Context</strong> → <strong>Final Tidbits</strong>. In short: Important Info & Prerequisites → Dashboard Configuration → Final Polish & Testing.`},
+        {label:'Article titles', badge:{text:'Standard',type:'note'}, heading:'Writing good titles',
+          body:`A title should clearly identify what the article covers. Avoid overly broad titles — they make it harder for customers to determine relevance and harder for the CS team to share articles confidently. If a title can't capture all the article's contents, the article may need to be divided into smaller pieces.`},
+        {label:'HelpScout upload', badge:{text:'Process',type:'tip'}, heading:'Uploading to HelpScout',
+          body:`Copy and paste article content directly into HelpScout — formatting applies automatically. For articles requiring a table of contents, create it manually by hovering over headings to copy anchor links. Toggle <strong>Open in a new tab</strong> off for all TOC links. Estimated time: 50% at 30 min, 75% at 1 hour, 90% at 2 hours depending on article length.`},
+        {label:'Screenshots', badge:{text:'Warning',type:'warning'}, heading:'Screenshot accounts and environments',
+          body:`Always use the <strong>KBSpace event</strong> for dashboard screenshots. Use the demo account (Bryan Coffer, <code>demos@pheedloop.com</code>) — never your personal account. Your email must not appear in the top-right corner. Use the smaller monitor on the Mac laptop to hide it via resolution. Never use <code>demo@pheedloop.com</code> — that account is for Sales.`},
+        {label:'Image compression', badge:{text:'Warning',type:'warning'},
+          body:`For articles with 10+ images, compress all images before uploading. HelpScout will struggle to load pages with multiple large uncompressed files.`},
+        {label:'PheedLoop Go! screenshots', badge:{text:'Standard',type:'note'}, heading:'Screenshots for PheedLoop Go!',
+          body:`Screenshots must be <strong>1080×1920</strong>. Use the PheedLoop Go 2.0 app on a personal device where available — web-based versions are less stable. Use Responsively App if a device screenshot is not possible. Never use test event apps like Indoor Eden Conference — they contain test data.`},
+        {label:'Reviewing dev updates', badge:{text:'Process',type:'tip'}, heading:'Reviewing developer updates',
+          body:`All updates are posted in <strong>#customers-learning</strong> on Slack as bullet points categorized as "new feature," "housekeeping," or "bug fix." Document any KB updates made on the Knowledge Base Edit Request Form in Notion. Notes should be succinct but clear enough to understand six months later.`},
+        {label:'KB update flags', badge:{text:'Reference',type:'note'}, heading:'When to update the KB',
+          table:{headers:['Update KB','Do not update KB'], rows:[
+            ['Change categorized as "new feature"','Bug fixes (with rare exceptions)'],
+            ['Adjustment to an existing feature','Visual changes to the Event Dashboard (case-by-case)'],
+            ['A setting has been removed','Updates listed under "building towards bigger things"'],
+            ['A feature limit has been modified (e.g. file size cap)','ASAE-only updates (never publish these)']
+          ]}},
+        {label:'Bug reporting', badge:{text:'Process',type:'tip'}, heading:'Reporting bugs to the dev team',
+          body:null, list:[
+            'Always verify the bug is replicable before reporting',
+            'Always include customer impact — even a one-liner (e.g. "Not blocking a customer" or "Customer X needs this ASAP")',
+            'Report in #customers-engineering. Do not file tickets on behalf of the CS team or George'
+          ]},
+        {label:'Knowledge Base sites', badge:{text:'Reference',type:'note'}, heading:'Navigating the five KB sites',
+          table:{headers:['Site','Focus'], rows:[
+            ['Setup Instructions for Event Planners','Core setup guides — bulk of your time'],
+            ['FAQs & Troubleshooting','Nuanced settings and edge cases'],
+            ['Membership Management','Membership-specific content'],
+            ['Attendee, Exhibitor & Sponsor Support','Attendee-facing guides'],
+            ['Onsite Operations Guides','PheedLoop OnSite hardware and check-in']
+          ]}},
+        {label:'CS team requests', badge:{text:'Process',type:'tip'}, heading:'Managing requests from the CS team',
+          body:`Review the KB Requests Form and KB Feedback Form in Notion regularly. Think critically — what the CS team asks for and what actually needs to change are not always the same thing. A minor tweak request may reveal an outdated article. Consider the company's image: avoid exposing feature limitations publicly where possible; use the Internal KB instead.`},
+        {label:'Style rules', badge:{text:'Standard',type:'note'}, heading:'Key style rules',
+          list:[
+            'Use American spelling throughout — that is what the dashboard is written in',
+            'Bold UI element names (tabs, fields, checkboxes) but do not bold the words "tab," "field," or "checkbox"',
+            'Capitalize platform names: Registration, Virtual Portal, PheedLoop Go!, PheedLoop OnSite',
+            'No periods at the end of bullet points. Sub-points should have periods (they may contain multiple sentences)',
+            'Avoid terms: Access, Save, Register — readers may confuse these with computer terminology',
+            'Never use colour to identify buttons (e.g. "the blue button") — reference by name only',
+            'Never use quotation marks to refer to UI elements — use bold instead',
+            'Avoid mentioning something is "new" — that\'s for blog posts, not KB articles',
+            'Always use "fill out," never "fill in"',
+            'No colons in headings or subheadings'
+          ]},
+        {label:'URL changes', badge:{text:'Warning',type:'warning'},
+          body:`Avoid changing article URLs wherever possible. Many are saved in CS team reply templates — URL changes break those references silently. If absolutely necessary, notify the CS team in advance. Newly created articles can have their URL set freely.`},
+        {label:'Advanced tools', badge:{text:'Internal',type:'purple'}, heading:'Advanced tools',
+          body:`<strong>Pokedex:</strong> PheedLoop's master backend for organizations and events. Useful for configuring test events with different Power-Up combinations. Speak with Christian for access. <strong>Staging:</strong> A pre-release environment for testing upcoming features. Do not plan articles assuming staging behaviour is final. <strong>#cs-agent (HelpDraft):</strong> An internal AI that can parse the codebase. Use sparingly — it incurs cost. Always verify its answers manually in a test event. Do not share PII with it.`}
+      ]}
+  },
+
+  'keyword-framework': {
+    c: { eyebrow:'Internal Documentation', title:'Keyword Framework 2.0', tags:['Internal','SEO','Knowledge Base','Strategy'],
+      intro:`This document proposes a structural improvement to how PheedLoop's knowledge base articles are tagged for search. The original framework standardized keyword usage but didn't account for article hierarchy — core and edge-case articles were competing equally in search results.`,
+      body:`The proposal introduces a two-tier system. <strong>Tier 1 articles</strong> (core functionality) include the module name as a keyword plus repetition to boost rank. <strong>Tier 2 articles</strong> (supporting, edge-case, cross-module) explicitly exclude the module name to avoid competing with Tier 1 in the same search.`,
+      annotation:`"Brute forcing" is intentional terminology — it's a known SEO technique and naming it directly makes the intent clear. Repeating a keyword up to 3 times in HelpScout inflates its weighting. The framework caps this at 3 to avoid over-optimization.`,
+      decisions:`I included the downside risks explicitly: over-optimization and classification ambiguity. A framework that only presents benefits reads as a sales pitch. Surfacing the tradeoffs builds credibility and prompts the right conversations about implementation guardrails.`},
+    content: { type:'Internal Document', title:'Keyword Framework 2.0',
+      blocks:[
+        {label:'Problem statement',
+          body:`The original framework standardized article tagging but did not account for article importance. Core and edge-case articles were treated equally, causing supporting articles to compete with essential guides in search results.`},
+        {label:'Tier 1 — Core articles', badge:{text:'Tier 1',type:'tip'}, heading:'Core / essential articles',
+          body:`Articles essential to a module's core functionality with high search volume. Strategy: include the <strong>exact module name</strong> in position 1; add 2–3 primary function keywords; brute-forcing permitted (repeat keyword up to 3×). Output format: <code>module name, keyword2, keyword3, keyword4</code>`},
+        {label:'Tier 2 — Supporting articles', badge:{text:'Tier 2',type:'note'}, heading:'Supporting / edge-case articles',
+          body:`Optional enhancements, edge cases, troubleshooting, cross-module, and advanced use cases. Strategy: <strong>exclude the exact module name</strong>; use 4–7 functional and task-based keywords. Output format: <code>keyword1, keyword2, keyword3, keyword4, keyword5</code>`},
+        {label:'Tier comparison', badge:{text:'Reference',type:'note'},
+          table:{headers:['Attribute','Tier 1','Tier 2'], rows:[
+            ['Module name as keyword','Required (position 1)','Excluded'],
+            ['Keyword count','4–7 (up to 10 if critical)','4–7'],
+            ['Brute forcing','Permitted (max 3×)','Not applicable'],
+            ['Article type','Core functionality','Supporting, edge case, cross-module']]}},
+        {label:'Risks to consider', badge:{text:'Warning',type:'warning'}, list:['Risk of over-optimizing Tier 1 articles through excessive brute forcing','Ambiguity in classification — who ultimately decides an article\'s tier?','Tier 2 articles may become harder to discover if exclusion is too aggressive']}
+      ]}
+  }
+};
+
+function getBadgeClass(t){return{warning:'badge-warning',tip:'badge-tip',purple:'badge-purple'}[t]||'badge-note';}
+function renderTable(t){
+  const ths=t.headers.map(h=>`<th>${h}</th>`).join('');
+  const trs=t.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+  return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+}
+
+function load(id,btn){
+  const art=A[id]; if(!art)return;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const c=art.c;
+  document.getElementById('commentary').innerHTML=`
+    <div class="commentary-eyebrow">${c.eyebrow}</div>
+    <h1>${c.title}</h1>
+    <div class="commentary-meta">${c.tags.map(t=>`<span class="meta-tag">${t}</span>`).join('')}</div>
+    <p>${c.intro}</p><p>${c.body}</p>
+    ${c.annotation?`<div class="annotation"><p>${c.annotation}</p></div>`:''}
+    <div class="commentary-section"><h2>Editorial decisions</h2><p>${c.decisions}</p></div>
+    ${c.url?`<div class="commentary-section"><h2>Original article</h2><a href="${c.url}" target="_blank" class="original-link">Read the original article <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a></div>`:''}
+  `;
+  const ct=art.content;
+  document.getElementById('content').innerHTML=`
+    <div class="content-header"><div class="type-label">${ct.type}</div><h2>${ct.title}</h2></div>
+    ${ct.blocks.map(b=>`
+      <div class="doc-block">
+        <div class="doc-block-header">
+          <span class="doc-block-label">${b.label}</span>
+          ${b.badge?`<span class="doc-block-badge ${getBadgeClass(b.badge.type)}">${b.badge.text}</span>`:''}
+        </div>
+        <div class="doc-block-body">
+          ${b.heading?`<h3>${b.heading}</h3>`:''}
+          ${b.body?`<p>${b.body}</p>`:''}
+          ${b.list?`<ul>${b.list.map(i=>`<li>${i}</li>`).join('')}</ul>`:''}
+          ${b.table?renderTable(b.table):''}
+        </div>
+      </div>`).join('')}`;
+  document.querySelector('.content').scrollTop=0;
+  document.querySelector('.commentary').scrollTop=0;
+}
+
+function loadAbout(btn){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+
+  document.getElementById('commentary').innerHTML=`
+    <div class="commentary-eyebrow">Portfolio</div>
+    <h1>Anson Wong</h1>
+    <div class="commentary-meta">
+      <span class="meta-tag">Technical Writer</span>
+      <span class="meta-tag">Richmond Hill, ON</span>
+    </div>
+    <p>This portfolio collects technical documentation, internal knowledge base articles, and content strategy work produced at <strong>PheedLoop</strong> — an event management SaaS platform serving Canadian and American markets.</p>
+    <p>Each article includes a commentary panel (what you're reading now) that walks through the writing decisions behind the piece: the audience, the structural choices, and the editorial tradeoffs. Browse the articles using the navigation on the left.</p>
+    <div class="commentary-section">
+      <h2>About this site</h2>
+      <p>Built as a static GitHub Pages site — plain HTML, CSS, and JavaScript. Designed to mirror the format of API documentation, reflecting the technical nature of the work inside.</p>
+    </div>`;
+
+  document.getElementById('content').innerHTML=`
+    <div class="content-header">
+      <div class="type-label">About</div>
+      <h2>Anson Wong</h2>
+    </div>
+
+    <div class="bio-photo-wrapper">
+      <div class="bio-photo-placeholder">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="15" r="7" stroke="#9d9b96" stroke-width="1.5" fill="none"/>
+          <path d="M6 36c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke="#9d9b96" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
+        <p>Add a photo of yourself here.<br/>Place your image at <code style="font-size:11px;">images/anson.jpg</code><br/>then replace this placeholder with:<br/><code style="font-size:11px;">&lt;img src="images/anson.jpg" alt="Anson Wong" /&gt;</code></p>
+      </div>
+    </div>
+
+    <div class="bio-block">
+      <h3>Background</h3>
+      <p>I'm a technical writer based in Richmond Hill, Ontario, with three years of experience in content strategy, documentation, and digital communication. I currently lead the Knowledge Base at <strong>PheedLoop</strong>, where I build and maintain the support documentation used by event organizers across Canada and the United States.</p>
+      <p>My work spans support articles, internal knowledge base documentation, UI help text, and marketing content. A recurring focus is reducing support inquiry volume through clear, well-structured documentation — writing that gets people to the answer before they need to ask.</p>
+    </div>
+
+    <div class="bio-block">
+      <h3>Before technical writing</h3>
+      <p>My background is in journalism, with a degree from the <strong>University of Toronto</strong>. I've written for and been published in <strong>Yahoo Finance</strong> and the <strong>Financial Post</strong>, covering business and technology. That foundation — research, clarity under deadline, writing for a general audience — carries directly into how I approach documentation today.</p>
+      <p>At PheedLoop I've expanded beyond writing into quality assurance, testing new features and documenting bugs, and contributing to product roadmapping in an agile environment. I think of documentation not as standalone text but as part of a cohesive user experience.</p>
+    </div>
+
+    <div class="bio-block">
+      <h3>Get in touch</h3>
+      <div class="bio-links">
+        <a class="bio-link" href="https://www.linkedin.com/in/anson-wong-3294021b2/" target="_blank">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          linkedin.com/in/anson-wong-3294021b2
+        </a>
+        <a class="bio-link" href="mailto:Ansonwong474@gmail.com">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          Ansonwong474@gmail.com
+        </a>
+        <a class="bio-link" href="tel:6478081312">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.9a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 16z"/></svg>
+          (647) 808-1312
+        </a>
+      </div>
+    </div>`;
+
+  document.querySelector('.content').scrollTop=0;
+  document.querySelector('.commentary').scrollTop=0;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const aboutBtn = document.querySelector('.nav-item');
+  if(aboutBtn) loadAbout(aboutBtn);
+});
+</script>
+</body>
+</html>
