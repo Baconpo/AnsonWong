@@ -88,6 +88,18 @@
     .bio-link:hover { color: var(--color-text-primary); }
     .bio-link svg { flex-shrink: 0; opacity: 0.45; transition: opacity 0.1s; }
     .bio-link:hover svg { opacity: 0.9; }
+    .code-block-wrapper { position: relative; background: #1a1916; border: 1px solid var(--color-content-border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+    .code-block-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: #23221e; border-bottom: 1px solid #2e2c27; }
+    .code-block-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #9d9b96; font-family: var(--font-mono); }
+    .code-block-actions { display: flex; gap: 8px; }
+    .copy-btn { background: #2e2c27; border: 1px solid #3a3832; color: #d4d2cc; font-family: var(--font-mono); font-size: 11px; padding: 5px 11px; border-radius: 4px; cursor: pointer; transition: background 0.1s, color 0.1s, border-color 0.1s; text-decoration: none; display: inline-block; line-height: 1.4; }
+    .copy-btn:hover { background: #3a3832; color: #fff; }
+    .copy-btn.copied { background: #15803d; border-color: #15803d; color: #fff; }
+    .code-block-wrapper pre { margin: 0; padding: 18px 20px; overflow-x: auto; overflow-y: auto; max-height: 70vh; font-family: var(--font-mono); font-size: 12px; line-height: 1.6; color: #e4e2dc; background: transparent; }
+    .code-block-wrapper pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; white-space: pre; font-family: inherit; }
+    .code-block-wrapper pre::-webkit-scrollbar { width: 8px; height: 8px; }
+    .code-block-wrapper pre::-webkit-scrollbar-thumb { background: #3a3832; border-radius: 4px; }
+    .code-block-wrapper pre::-webkit-scrollbar-track { background: #23221e; }
     .original-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; border-bottom: 1px solid var(--color-border); padding-bottom: 1px; transition: color 0.1s, border-color 0.1s; }
     .original-link:hover { color: var(--color-text-primary); border-color: var(--color-text-primary); }
     nav::-webkit-scrollbar, .commentary::-webkit-scrollbar, .content::-webkit-scrollbar { width: 4px; }
@@ -153,6 +165,10 @@
     </div>
     <div class="nav-section" style="padding-bottom: 14px; border-bottom: 1px solid var(--color-border-subtle);">
       <button class="nav-item" onclick="loadAbout(this)" style="font-weight: 400; color: var(--color-text-secondary);"><span class="nav-dot"></span>About me</button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">OpenAPI</div>
+      <button class="nav-item" onclick="load('openapi-spec',this)"><span class="nav-dot"></span>PheedLoop OpenAPI specification</button>
     </div>
     <div class="nav-section">
       <div class="nav-section-label">Registration</div>
@@ -515,6 +531,20 @@ const A = {
       ]}
   },
 
+  'openapi-spec': {
+    c: { eyebrow:'Portfolio Project · OpenAPI', title:'PheedLoop OpenAPI specification', tags:['OpenAPI','Swagger','API Documentation'],
+      intro:`While Swagger files are often auto-generated in the industry, I chose to write an OpenAPI specification document by hand as a portfolio piece based on my work at PheedLoop. To be transparent: this OpenAPI document is my own independent work and is not affiliated with or endorsed by the company. It exists solely as a portfolio sample. PheedLoop's official API documentation is available at <strong>develop.pheedloop.com</strong>.<br><br>To explore it, copy the code from the right side of the screen and paste it into <strong>editor.swagger.io</strong>. Swagger will transform the spec into a readable, interactive display that updates in real time as you edit.`,
+      body:`This project has been an important milestone in my progression as a technical writer. It gave me a reason to work directly with PheedLoop's backend and develop a concrete sense of what the platform can do. Documenting a real API taught me far more than any tutorial could. By mapping out each endpoint, I came to understand how Swagger actually behaves, and underlying concepts like schemas became much easier to grasp within the context of PheedLoop's Event Dashboard.<br><br>One of the more meaningful decisions in this project came from a validation warning that many developers would dismiss out of hand: <em>"requestBody does not have well-defined semantics for GET, HEAD and DELETE operations."</em><br><br>Three DELETE endpoints in PheedLoop's Postman collection (<code>bulkDeleteAttendees</code>, <code>eventCheckOut</code>, and <code>bulkDeleteSessionRegistrations</code>) were accepting a JSON body containing a <code>codes</code> array to identify which records to delete. While some HTTP clients technically allow this, it is explicitly undefined behaviour under the HTTP specification and is flagged as an error in OpenAPI 3.1.0.<br><br>Instead of ignoring the warning, I addressed it directly in the documentation. I moved the <code>codes</code> array to a query parameter on each operation, and added <code>style: form</code> and <code>explode: true</code>, which causes multiple values to serialize as repeated parameters (e.g., <code>?codes=ABC&amp;codes=DEF</code>). This pattern is widely supported across HTTP clients and API gateways, and produces a spec that is both standards-compliant and implementable without any change to the underlying API behaviour.<br><br>Migrating to OpenAPI 3.1.0 also brought smaller adjustments. For example, the Schema Object's <code>example</code> keyword was deprecated in 3.1 in favour of JSON Schema's <code>examples</code> array, and I updated the spec to use the newer form where applicable.<br><br>Closing gaps like these is, to me, the heart of technical writing: identify where documentation and behaviour diverge, and resolve the difference. In the best case, issues like these can be resolved entirely within the documentation layer, without requiring developer involvement.`,
+      annotation:`The spec covers 24 resource groups across PheedLoop's platform — from events and attendees through to memberships, reports, and REST hooks — spanning roughly 60 endpoints.`,
+      decisions:`I chose to present the full YAML in a single scrollable, copy-pastable block rather than embedding a live Swagger UI into the portfolio. The rendering conventions of Swagger UI don't mesh with the editorial aesthetic of this site, and the copy-to-editor.swagger.io workflow gives readers a cleaner way to explore the spec interactively on their own terms.`},
+    content: { type:'Portfolio Project', title:'PheedLoop OpenAPI 3.1.0 specification',
+      blocks:[
+        {label:'About this spec', badge:{text:'Disclaimer',type:'warning'},
+          body:`This is an unofficial OpenAPI 3.1.0 specification for the PheedLoop REST API, authored by hand as a portfolio piece. It is not affiliated with or endorsed by PheedLoop. To explore it interactively, copy the YAML below and paste it into <a href="https://editor.swagger.io" target="_blank" style="color:var(--color-text-primary);text-decoration:underline;text-underline-offset:2px;">editor.swagger.io</a>.`},
+        {label:'openapi.yaml', codeSrc:'openapi/pheedloop-openapi-spec.yaml'}
+      ]}
+  },
+
   'channels': {
     c: { eyebrow:'Support Documentation · Experiences', title:'Sessions channels feature', tags:['Virtual Portal','Event App','Sessions'],
       intro:`Channels are simple in concept but confusing in execution because of how they relate to the existing Sessions feature. The article had to establish that relationship clearly before explaining how to use them — otherwise readers end up accidentally creating duplicate session entries.`,
@@ -687,6 +717,21 @@ const A = {
 };
 
 function getBadgeClass(t){return{warning:'badge-warning',tip:'badge-tip',purple:'badge-purple'}[t]||'badge-note';}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function copyCode(id,btn){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const text=el.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig=btn.textContent;
+    btn.textContent='Copied';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},1600);
+  }).catch(()=>{
+    btn.textContent='Copy failed';
+    setTimeout(()=>{btn.textContent='Copy';},1600);
+  });
+}
 function renderTable(t){
   const ths=t.headers.map(h=>`<th>${h}</th>`).join('');
   const trs=t.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
@@ -711,7 +756,23 @@ function load(id,btn){
   const ct=art.content;
   document.getElementById('content').innerHTML=`
     <div class="content-header"><div class="type-label">${ct.type}</div><h2>${ct.title}</h2></div>
-    ${ct.blocks.map(b=>`
+    ${ct.blocks.map((b,i)=>{
+      if(b.code||b.codeSrc){
+        const cid='code-'+id+'-'+i;
+        const filename=b.codeSrc?b.codeSrc.split('/').pop():'code.txt';
+        const initial=b.code?escapeHtml(b.code):'Loading…';
+        return `<div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span class="code-block-label">${b.label||'Code'}</span>
+            <div class="code-block-actions">
+              <button class="copy-btn" onclick="copyCode('${cid}',this)">Copy</button>
+              ${b.codeSrc?`<a class="copy-btn" href="${b.codeSrc}" download="${filename}">Download</a>`:''}
+            </div>
+          </div>
+          <pre><code id="${cid}">${initial}</code></pre>
+        </div>`;
+      }
+      return `
       <div class="doc-block">
         <div class="doc-block-header">
           <span class="doc-block-label">${b.label}</span>
@@ -723,7 +784,21 @@ function load(id,btn){
           ${b.list?`<ul>${b.list.map(i=>`<li>${i}</li>`).join('')}</ul>`:''}
           ${b.table?renderTable(b.table):''}
         </div>
-      </div>`).join('')}`;
+      </div>`;
+    }).join('')}`;
+  ct.blocks.forEach((b,i)=>{
+    if(b.codeSrc){
+      const cid='code-'+id+'-'+i;
+      const el=document.getElementById(cid);
+      if(!el)return;
+      fetch(b.codeSrc).then(r=>{
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        return r.text();
+      }).then(text=>{el.textContent=text;}).catch(err=>{
+        el.textContent='Failed to load '+b.codeSrc+' ('+err.message+').\n\nIf you are previewing this site locally over file://, the fetch will fail — serve the folder over HTTP or view the deployed site instead.';
+      });
+    }
+  });
   document.querySelector('.content').scrollTop=0;
   document.querySelector('.commentary').scrollTop=0;
   document.querySelectorAll('.doc-block-body img').forEach(img => {
